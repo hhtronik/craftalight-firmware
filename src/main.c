@@ -51,6 +51,7 @@ void init_sysclock(void);
 void init_TIM1(void);
 void init_low_power(void);
 void init_gpio(void);
+void init_option_bytes(void);
 void TIM1_set(uint16_t count);
 
 // blink the power LEDs N times (with specified duty cycle)
@@ -85,6 +86,7 @@ void main()
   systick_enable();
   init_TIM1();
   init_low_power();
+  init_option_bytes();  
 
   // enable interrupts (on both edge) for Port B and D
   EXTI_CR1_bit.PBIS = EXTI_CRx_PxIS_RisingAndFallingEdge; // Interrupt on both edge.
@@ -171,6 +173,39 @@ void main()
       delayms(MAIN_LOOP_STEP_DURATION);
     }
   }
+}
+
+// On the STM8S003 we have to use the OPT2 option byte to "remap"
+// the TIM1_CH1 PWM output to pin C6. To do this we set the AFR0 bit
+// in OPT2 to 1 and it's complementary in NOPT2 to zero.
+//
+// This is done by writing to the flash memory, so we have to unlock that first.
+// To not wear out the flash memory we check the config prior to doing anything
+void init_option_bytes(void)
+{
+  // option bit already set, move on
+  if(OPT2_bit.AFR0 == 1) return;
+
+  // unnprotect the flash area by writing the unlock key
+  FLASH_DUKR = FLASH_DUKR_KEY1;
+  FLASH_DUKR = FLASH_DUKR_KEY2;
+
+  // wait for the unlocking to be complete
+  while (!(FLASH_IAPSR_bit.DUL));
+
+  // allow us writing the option bytes
+  FLASH_CR2_bit.OPT = 1;
+  FLASH_NCR2_bit.NOPT = 0;
+
+  // change the config
+  OPT2_bit.AFR0 = 1;
+  NOPT2_bit.NAFR0 = 0;
+
+  // wait for the end of the programming
+  while (!(FLASH_IAPSR_bit.EOP));
+    
+  // re-lock the flash
+  FLASH_IAPSR_bit.DUL = 0;
 }
 
 void init_gpio(void)
@@ -459,9 +494,9 @@ void button_doubleclick_IN_SETUP(void)
   usb_blip_reconfigure();
 
   if (Config.EnableUSBPowerBlip)
-    blink_leds_delay(3, 150, 500);
+    blink_leds_delay(5, 150, 800);
   else
-    blink_leds_delay(3, 500, 150);
+    blink_leds_delay(10, 150, 150);
 
   setup_activity_time = millis();
 }

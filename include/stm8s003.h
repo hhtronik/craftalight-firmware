@@ -190,6 +190,48 @@ typedef struct
 #define FLASH_DUKR_KEY1                 FLASH_PUKR_KEY2
 #define FLASH_DUKR_KEY2                 FLASH_PUKR_KEY1
 
+/* Option bytes */
+
+#define OPT0                            (*(volatile uint8_t *)(0x4800))
+#define OPT1                            (*(volatile uint8_t *)(0x4801))
+#define NOPT1                           (*(volatile uint8_t *)(0x4802))
+#define OPT2                            (*(volatile uint8_t *)(0x4803))
+#define NOPT2                           (*(volatile uint8_t *)(0x4804))
+#define OPT3                            (*(volatile uint8_t *)(0x4805))
+#define NOPT3                           (*(volatile uint8_t *)(0x4806))
+#define OPT4                            (*(volatile uint8_t *)(0x4807))
+#define NOPT4                           (*(volatile uint8_t *)(0x4808))
+#define OPT5                            (*(volatile uint8_t *)(0x4809))
+#define NOPT5                           (*(volatile uint8_t *)(0x480a))
+
+typedef struct
+{
+  unsigned char AFR0     : 1;
+  unsigned char AFR1     : 1;
+  unsigned char AFR2     : 1;
+  unsigned char AFR3     : 1;
+  unsigned char AFR4     : 1;
+  unsigned char AFR5     : 1;
+  unsigned char AFR6     : 1;
+  unsigned char AFR7     : 1;
+} reg_opt2;
+
+#define OPT2_bit                        (*(volatile reg_opt2 *)(0x4803))
+
+typedef struct
+{
+  unsigned char NAFR0     : 1;
+  unsigned char NAFR1     : 1;
+  unsigned char NAFR2     : 1;
+  unsigned char NAFR3     : 1;
+  unsigned char NAFR4     : 1;
+  unsigned char NAFR5     : 1;
+  unsigned char NAFR6     : 1;
+  unsigned char NAFR7     : 1;
+} reg_nopt2;
+
+#define NOPT2_bit                        (*(volatile reg_nopt2 *)(0x4804))
+
 /* DMA1 */
 typedef struct
 {
