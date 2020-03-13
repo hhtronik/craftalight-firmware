@@ -3,6 +3,8 @@ Craftalight
 
 This repository contains the firmware for Craftalight, the open source hardware USB-powered LED light for your (hand)bag.
 
+The hardware repository for Craftalight is over there: [craftalight-hardware on Github](https://github.com/hhtronik/craftalight-hardware)
+
 > NOTE: this document is a work-in-progress
 
 
